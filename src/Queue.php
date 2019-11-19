@@ -175,7 +175,7 @@ class Queue extends Amqp
         // 自定义延时时间，这里要求对应的 死信队列 TTL 设置为最长时间
         // 比如第1次延迟15秒，第2次延迟30秒，那 死信队列 TTL 应该设置为 30000 毫秒
         if (empty($exchange)) {
-            $exchange = $message->getExchangeName() . $this->options['retry_exchange_suffix'];
+            $exchange = $message->getExchangeName() . $this->config['retry_exchange_suffix'];
         }
 
         $headers            = $message->getHeaders();
@@ -217,7 +217,7 @@ class Queue extends Amqp
     public function failed($message, $exchange = '', $exchange_type = AMQP_EX_TYPE_FANOUT, $routing_key = '')
     {
         if (empty($exchange)) {
-            $exchange = $message->getExchangeName() . $this->options['failed_exchange_suffix'];
+            $exchange = $message->getExchangeName() . $this->config['failed_exchange_suffix'];
         }
 
         Container::pull('exchange')
@@ -279,7 +279,7 @@ class Queue extends Amqp
     public function updateDeathHeader(AMQPEnvelope $message, string $reason)
     {
 
-        $headers     = $message->getHeader('x-death');
+        $headers     = (array)$message->getHeader('x-death');
         $deathHeader = [
             'count'        => 1,
             'exchange'     => $message->getExchangeName(),
