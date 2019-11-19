@@ -6,6 +6,7 @@ namespace think\amqp;
 use AMQPChannel;
 use AMQPConnection;
 use AMQPConnectionException;
+use Exception;
 use think\Config;
 
 class Amqp
@@ -30,6 +31,11 @@ class Amqp
         'failed_exchange_suffix' => '.failed', // 失败消息交换机的后缀
     ];
 
+    /**
+     * Amqp constructor.
+     * @param array $config
+     * @throws
+     */
     public function __construct(array $config)
     {
         //静态的连接信息，进程内只连接一次
@@ -81,42 +87,46 @@ class Amqp
 
     /**
      * 开启事务
+     * @return bool
      */
     public function startTrans()
     {
         try {
             return $this->channel->startTransaction();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
 
     /**
      * 提交事务
+     * @return bool
      */
     public function commit()
     {
         try {
             return $this->channel->commitTransaction();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
 
     /**
      * 事务回滚
+     * @return bool
      */
     public function rollback()
     {
         try {
             return $this->channel->rollbackTransaction();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
 
     /**
      * 获取当前通道
+     * @return AMQPChannel
      */
     public function getChannel()
     {
