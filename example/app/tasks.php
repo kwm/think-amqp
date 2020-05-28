@@ -28,7 +28,7 @@ return [
             ],
             // 失败方法选项
             'failedOption' => [
-                // 失败交换机，默认为 `当前消息源交换机.retry`
+                // 失败交换机，默认为 `当前消息源交换机.failed`
                 'exchange'      => '',
                 // 失败交换机类型
                 'exchange_type' => AMQP_EX_TYPE_FANOUT,
