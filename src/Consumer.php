@@ -48,7 +48,7 @@ class Consumer
                 }
             });
         } catch (Exception $e) {
-            echo 'consumer exec error: ', $e->getMessage(), PHP_EOL;
+            echo 'consumer exec error: ', $e->getMessage(), '[', $e->getFile(), ':', $e->getLine(), ']' , PHP_EOL;
             $mq->getQueue() && $mq->cancel();
         }
     }
