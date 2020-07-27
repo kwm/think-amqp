@@ -29,6 +29,7 @@ class Consumer
                 try {
                     $res = call_user_func($handle, $msg, $queue, $deathCount);
                 } catch (Exception $e) {
+                    echo 'handle error: ', $e->getMessage(), '[', $e->getFile(), ':', $e->getLine(), ']' , PHP_EOL;
                     $res = false;
                 }
 
