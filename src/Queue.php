@@ -252,6 +252,7 @@ class Queue extends Amqp
      */
     public function getDeathCount(AMQPEnvelope $message, string $reason = '')
     {
+        /** @var array|boolean $headers */
         $headers = $message->getHeader('x-death');
         if (empty($headers)) {
             return 0;
@@ -259,7 +260,7 @@ class Queue extends Amqp
             return $headers[0]['count'];
         }
 
-        foreach ($headers AS $header) {
+        foreach ($headers as $header) {
             // 消息变成死信的原因相同，使用原数据（包括路由、时间等），次数 +1
             if ($header['reason'] == $reason) {
                 return $header['count'];
@@ -278,8 +279,8 @@ class Queue extends Amqp
      */
     public function updateDeathHeader(AMQPEnvelope $message, string $reason)
     {
-
-        $headers     = (array)$message->getHeader('x-death');
+        /** @var array|boolean $headers */
+        $headers     = $message->getHeader('x-death');
         $deathHeader = [
             'count'        => 1,
             'exchange'     => $message->getExchangeName(),
@@ -294,7 +295,7 @@ class Queue extends Amqp
         if (empty($headers)) {
             return [$deathHeader];
         } else {
-            foreach ($headers AS $i => $header) {
+            foreach ($headers as $i => $header) {
                 // 消息变成死信的原因相同，使用原数据（包括路由、时间等），次数 +1
                 if ($header['reason'] == $reason) {
                     $deathHeader = $header;
