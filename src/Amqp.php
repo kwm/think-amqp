@@ -6,6 +6,7 @@ namespace think\amqp;
 use AMQPChannel;
 use AMQPConnection;
 use AMQPConnectionException;
+use AMQPException;
 use Exception;
 use think\Config;
 
@@ -57,11 +58,13 @@ class Amqp
             $this->channel = new AMQPChannel(self::$connection);
 
             $this->reConnectTimes = 0;
-        } catch (\AMQPException $e) {
+        } catch (AMQPException $e) {
             if ($config['reConnect'] && $this->reConnectTimes < $config['reConnect']) {
                 $this->reConnectTimes++;
                 self::$connection->preconnect();
                 $this->__construct($config);
+            } else {
+                throw $e;
             }
         }
     }
