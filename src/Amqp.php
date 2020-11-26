@@ -27,9 +27,16 @@ class Amqp
         'read_timeout'           => 30, // 读取超时时间，该设置会影响消费者订阅的阻塞时间，设置为 0 时，不会超时
         'write_timeout'          => 30,
         'connect_timeout'        => 5,
+        'reConnect'               => 3,
         'retry_exchange_suffix'  => '.retry', // 重试消息交换机的后缀
         'failed_exchange_suffix' => '.failed', // 失败消息交换机的后缀
     ];
+
+    /**
+     * 重连次数
+     * @var int
+     */
+    protected $reConnectTimes = 0;
 
     /**
      * Amqp constructor.
@@ -38,15 +45,25 @@ class Amqp
      */
     public function __construct(array $config)
     {
+        $config = array_merge($this->config, $config);
         //静态的连接信息，进程内只连接一次
         if (is_null(self::$connection) || !self::$connection->isConnected()) {
-            $config           = array_merge($this->config, $config);
             self::$connection = new AMQPConnection($config);
             self::$connection->pconnect();
         }
 
         // 实例化时都建立新通道
-        $this->channel = new AMQPChannel(self::$connection);
+        try {
+            $this->channel = new AMQPChannel(self::$connection);
+
+            $this->reConnectTimes = 0;
+        } catch (\AMQPException $e) {
+            if ($config['reConnect'] && $this->reConnectTimes < $config['reConnect']) {
+                $this->reConnectTimes++;
+                self::$connection->preconnect();
+                $this->__construct($config);
+            }
+        }
     }
 
     public static function __make(Config $config)
